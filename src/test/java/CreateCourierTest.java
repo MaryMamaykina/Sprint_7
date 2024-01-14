@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import io.restassured.RestAssured;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
+import io.restassured.response.Response;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,18 +24,21 @@ public class CreateCourierTest {
     private final String password = "109567";
     private final String firstName = "John";
 
-    private IDCourier loginCourierInSystem(String givenLogin, String givenPassword){
+    private IDCourier loginCourierInSystem(String givenLogin, String givenPassword) {
         LoginCourier loginCourier = new LoginCourier(givenLogin, givenPassword);
-        return given()
+        Response response = given()
                 .header("Content-type", "application/json")
                 .body(loginCourier)
                 .when()
-                .post("/api/v1/courier/login")
-                .body()
-                .as(IDCourier.class);
-
+                .post("/api/v1/courier/login");
+        if (response.getStatusCode() == 200) {
+            return response.body().as(IDCourier.class);
+        } else {
+            return null;
+        }
     }
-    private void deleteCourier(IDCourier idCourier){
+
+    private void deleteCourier(IDCourier idCourier) {
         given()
                 .header("Content-type", "application/json")
                 .body(idCourier)
@@ -42,19 +46,10 @@ public class CreateCourierTest {
                 .delete("/api/v1/courier/" + idCourier.getID())
                 .then().assertThat().statusCode(200);
     }
-    private void deleteCourierByID(int id){
-        String idCourier = "{\"id\" : id}";
-        given()
-                .header("Content-type", "application/json")
-                .body(idCourier)
-                .when()
-                .delete("/api/v1/courier/" + id)
-                .then().assertThat().statusCode(200);
 
-    }
     @Test
-    public void creatingCourierWorks(){
-        NewCourier newCourier = new NewCourier(login, password , firstName);
+    public void creatingCourierWorks() {
+        NewCourier newCourier = new NewCourier(login, password, firstName);
         given()
                 .header("Content-type", "application/json")
                 .and()
@@ -64,12 +59,13 @@ public class CreateCourierTest {
                 .then().assertThat().statusCode(201)
                 .and()
                 .body("ok", equalTo(true));
-        IDCourier idCourier = loginCourierInSystem(login,password);
+        IDCourier idCourier = loginCourierInSystem(login, password);
         deleteCourier(idCourier);
     }
+
     @Test
-    public void creatingCourierWithTheSameLoginIsImpossible(){
-        NewCourier newCourier = new NewCourier(login, password , firstName);
+    public void creatingCourierWithTheSameLoginIsImpossible() {
+        NewCourier newCourier = new NewCourier(login, password, firstName);
         given()
                 .header("Content-type", "application/json")
                 .and()
@@ -87,9 +83,10 @@ public class CreateCourierTest {
                 .and()
                 .body("message", equalTo("Этот логин уже используется"));
     }
+
     @Test
     public void creatingCourierWithoutLoginIsImpossible() {
-        NewCourier newCourier = new NewCourier(login, null , firstName);
+        NewCourier newCourier = new NewCourier(login, null, firstName);
         given()
                 .header("Content-type", "application/json")
                 .and()
@@ -98,9 +95,10 @@ public class CreateCourierTest {
                 .post("/api/v1/courier")
                 .then().assertThat().statusCode(400);
     }
+
     @Test
     public void creatingCourierWithoutPasswordIsImpossible() {
-        NewCourier newCourier = new NewCourier(null, password , firstName);
+        NewCourier newCourier = new NewCourier(null, password, firstName);
         given()
                 .header("Content-type", "application/json")
                 .and()
@@ -111,24 +109,26 @@ public class CreateCourierTest {
                 .and()
                 .body("message", equalTo("Недостаточно данных для создания учетной записи"));
     }
+
     @Test
-    public void creatingCourierGetBodyOkTrue(){
-        NewCourier newCourier = new NewCourier(login, password , firstName);
-         given()
+    public void creatingCourierGetBodyOkTrue() {
+        NewCourier newCourier = new NewCourier(login, password, firstName);
+        given()
                 .header("Content-type", "application/json")
                 .and()
                 .body(newCourier)
                 .when()
                 .post("/api/v1/courier")
                 .then().assertThat().body("ok", equalTo(true));
-        IDCourier idCourier = loginCourierInSystem(login,password);
+        IDCourier idCourier = loginCourierInSystem(login, password);
         deleteCourier(idCourier);
     }
-//    @After
-//    public void CleanUp1() {
-//        if (loginCourierInSystem(login, password).equals(null)){
-//            IDCourier idCourier = loginCourierInSystem(login, password);
-//            deleteCourier(idCourier);}
-//
-//    }
+
+    @After
+    public void cleanUp() {
+        IDCourier idCourier = loginCourierInSystem(login, password);
+        if (idCourier != null) {
+            deleteCourier(idCourier);
+        }
+    }
 }
