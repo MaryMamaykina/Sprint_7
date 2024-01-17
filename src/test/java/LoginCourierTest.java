@@ -1,81 +1,107 @@
-import Scooter.IDCourier;
-import Scooter.LoginCourier;
-import Scooter.NewCourier;
-import io.restassured.RestAssured;
-import io.restassured.filter.log.RequestLoggingFilter;
-import io.restassured.filter.log.ResponseLoggingFilter;
-import io.restassured.response.Response;
-import org.hamcrest.MatcherAssert;
+import Scooter.GenerateData.CourierFactory.FirstNameGenerate;
+import Scooter.GenerateData.CourierFactory.LoginGenerate;
+import Scooter.GenerateData.CourierFactory.PasswordGenerate;
+import Scooter.StaticMethodsAndVariables.ScooterAPI;
 import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
-import static io.restassured.RestAssured.given;
+import static org.apache.http.HttpStatus.*;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 
 public class LoginCourierTest {
-    @Before
-    public void setUp() {
-        RestAssured.baseURI = "http://qa-scooter.praktikum-services.ru";
-        RestAssured.filters(new RequestLoggingFilter(), new ResponseLoggingFilter());
-    }
 
-    private final String login = "John Legenda";
-    private final String wrongLogin = "John Doe";
-    private final String password = "109567";
-    private final String wrongPassword = "197456";
-    private final String firstName = "John";
-    private final String handleForLoginCourier = "/api/v1/courier/login";
+    ScooterAPI scooterAPI = new ScooterAPI();
+    String login = new LoginGenerate().getRandomLogin();
+    String password = new PasswordGenerate().getRandomPassword();
+    String firstName = new FirstNameGenerate().getRandomFirstName();
 
-
-    private void createCourier(String givenLogin, String givenPassword, String givenFirstName) {
-        NewCourier newCourier = new NewCourier(givenLogin, givenPassword, givenFirstName);
-        given()
-                .header("Content-type", "application/json")
-                .and()
-                .body(newCourier)
-                .when()
-                .post("/api/v1/courier")
-                .then().assertThat().statusCode(201);
-    }
-
-    private void deleteCourier(IDCourier idCourier) {
-        given()
-                .header("Content-type", "application/json")
-                .body(idCourier)
-                .when()
-                .delete("/api/v1/courier/" + idCourier.getID())
-                .then().assertThat().statusCode(200);
+    @Test
+    public void doesLoginCourierWork() {
+        scooterAPI.createCourier(login, password, firstName);
+        scooterAPI.loginCourierInSystem(login, password).then().statusCode(SC_OK);
     }
 
     @Test
-    public void courierCanLogIn() {
-        createCourier(login, password, firstName);
-        LoginCourier loginCourier = new LoginCourier(login, password);
-        Response response = given()
-                .header("Content-type", "application/json")
-                .body(loginCourier)
-                .when()
-                .post(handleForLoginCourier);
-        IDCourier idCourier = response.body().as(IDCourier.class);
-        MatcherAssert.assertThat(idCourier.getID(), notNullValue());
-        Assert.assertEquals(response.getStatusCode(), 200);
+    public void doesLoginCourierReturnID() {
+        scooterAPI.createCourier(login, password, firstName);
+        scooterAPI.loginCourierInSystem(login, password).then().body("id", notNullValue());
+    }
+
+    @Test
+    public void doesLoginCourierThatNotExistReturnError() {
+        scooterAPI.loginCourierInSystem(login, password).then().statusCode(SC_NOT_FOUND)
+                .and()
+                .body("message", equalTo("Учетная запись не найдена"));
+    }
+
+    @Test
+    public void isLoginCourierWithoutLoginImpossible() {
+        scooterAPI.createCourier(login, password, firstName);
+        scooterAPI.loginCourierInSystem(null, password).then().statusCode(SC_BAD_REQUEST)
+                .and()
+                .body("message", equalTo("Недостаточно данных для входа"));
+    }
+
+    @Test
+    public void isLoginCourierWithoutPasswordImpossible() {
+        scooterAPI.createCourier(login, password, firstName);
+        scooterAPI.loginCourierInSystem(login, null).then().statusCode(SC_BAD_REQUEST)
+                .and()
+                .body("message", equalTo("Недостаточно данных для входа"));
+    }
+
+    @Test
+    public void isLoginCourierWithoutLoginAndPasswordImpossible() {
+        scooterAPI.createCourier(login, password, firstName);
+        scooterAPI.loginCourierInSystem(null, null).then().statusCode(SC_BAD_REQUEST)
+                .and()
+                .body("message", equalTo("Недостаточно данных для входа"));
+    }
+
+    @Test
+    public void doesLoginCourierWithoutLoginReturnThereIsNotEnoughDataToLogIn() {
+        scooterAPI.createCourier(login, password, firstName);
+        scooterAPI.loginCourierInSystem(null, password).then()
+                .body("message", equalTo("Недостаточно данных для входа"));
+    }
+
+    @Test
+    public void doesLoginCourierWithoutPasswordReturnThereIsNotEnoughDataToLogIn() {
+        scooterAPI.createCourier(login, password, firstName);
+        scooterAPI.loginCourierInSystem(login, null).then()
+                .body("message", equalTo("Недостаточно данных для входа"));
+    }
+
+    @Test
+    public void doesLoginCourierWithoutLoginAndPasswordReturnThereIsNotEnoughDataToLogIn() {
+        scooterAPI.createCourier(login, password, firstName);
+        scooterAPI.loginCourierInSystem(null, null).then()
+                .body("message", equalTo("Недостаточно данных для входа"));
+    }
+
+    @Test
+    public void doesLoginCourierWithWrongLoginReturnAccountWasNotFound() {
+        scooterAPI.createCourier(login, password, firstName);
+        String wronglogin = new LoginGenerate().getRandomLogin();
+        scooterAPI.loginCourierInSystem(wronglogin, password).then().statusCode(SC_NOT_FOUND)
+                .and()
+                .body("message", equalTo("Учетная запись не найдена"));
+    }
+
+    @Test
+    public void doesLoginCourierWithWrongPasswordReturnAccountWasNotFound() {
+        scooterAPI.createCourier(login, password, firstName);
+        String wrongpassword = new PasswordGenerate().getRandomPassword();
+        scooterAPI.loginCourierInSystem(login, wrongpassword).then().statusCode(SC_NOT_FOUND)
+                .and()
+                .body("message", equalTo("Учетная запись не найдена"));
     }
 
     @After
     public void cleanUp() {
-        LoginCourier loginCourier = new LoginCourier(login, password);
-        Response response = given()
-                .header("Content-type", "application/json")
-                .body(loginCourier)
-                .when()
-                .post(handleForLoginCourier);
-        IDCourier idCourier;
-        if (response.getStatusCode() == 200) {
-            idCourier = response.body().as(IDCourier.class);
-            deleteCourier(idCourier);
-        }
+        scooterAPI.cleanUp();
     }
+
+
 }
