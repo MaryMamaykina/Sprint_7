@@ -1,4 +1,4 @@
-package Scooter;
+package Scooter.DTO;
 
 public class NewCourier {
     private String login;

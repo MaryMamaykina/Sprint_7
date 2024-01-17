@@ -1,127 +1,111 @@
-import Scooter.IDCourier;
-import Scooter.LoginCourier;
-import Scooter.NewCourier;
-import com.google.gson.Gson;
-import io.restassured.RestAssured;
-import io.restassured.filter.log.RequestLoggingFilter;
-import io.restassured.filter.log.ResponseLoggingFilter;
-import io.restassured.response.Response;
+import Scooter.GenerateData.CourierFactory.FirstNameGenerate;
+import Scooter.GenerateData.CourierFactory.LoginGenerate;
+import Scooter.GenerateData.CourierFactory.PasswordGenerate;
+import Scooter.StaticMethodsAndVariables.ScooterAPI;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
-import static io.restassured.RestAssured.given;
 import static org.apache.http.HttpStatus.*;
 import static org.hamcrest.CoreMatchers.equalTo;
 
 public class CreateCourierTest {
-    @Before
-    public void setUp() {
-        RestAssured.baseURI = "http://qa-scooter.praktikum-services.ru";
-        RestAssured.filters(new RequestLoggingFilter(), new ResponseLoggingFilter());
-    }
+    ScooterAPI scooterAPI = new ScooterAPI();
 
-    private final String handleForCreateCourier = "/api/v1/courier";
-    private final String handleForLoginCourier = "/api/v1/courier/login";
-
-    private final String login = "John Legenda";
-    private final String password = "109567";
-    private final String anotherPassword = "197456";
-    private final String firstName = "John";
-    private final String anotherFirstName = "Johnny";
-
-    private Response createCourier(String givenLogin, String givenPassword, String givenFirstName) {
-        NewCourier newCourier = new NewCourier(givenLogin, givenPassword, givenFirstName);
-        Response response = given()
-                .header("Content-type", "application/json")
-                .and()
-                .body(new Gson().toJson(newCourier))
-                .when()
-                .post(handleForCreateCourier);
-        return response;
-    }
-
-
-    private Response loginCourierInSystem(String givenLogin, String givenPassword) {
-        LoginCourier loginCourier = new LoginCourier(givenLogin, givenPassword);
-        Response response = given()
-                .header("Content-type", "application/json")
-                .body(loginCourier)
-                .when()
-                .post(handleForLoginCourier);
-        return response;
-    }
-
-    private Response deleteCourier(IDCourier idCourier) {
-        Response response = given()
-                .header("Content-type", "application/json")
-                .body(idCourier)
-                .when()
-                .delete(handleForCreateCourier + "/" + idCourier.getID());
-        return response;
-    }
 
     @Test
     public void doesCreatingCourierWork() {
-        createCourier(login, password, firstName);
-        loginCourierInSystem(login, password).then().statusCode(SC_OK);
+        String login = new LoginGenerate().getRandomLogin();
+        String password = new PasswordGenerate().getRandomPassword();
+        String firstName = new FirstNameGenerate().getRandomFirstName();
+        scooterAPI.createCourier(login, password, firstName);
+        scooterAPI.loginCourierInSystem(login, password).then().statusCode(SC_OK);
+
     }
 
     @Test
     public void doesCreatingCourierReturnCode200() {
-        createCourier(login, password, firstName).then().statusCode(SC_CREATED);
+        String login = new LoginGenerate().getRandomLogin();
+        String password = new PasswordGenerate().getRandomPassword();
+        String firstName = new FirstNameGenerate().getRandomFirstName();
+        scooterAPI.createCourier(login, password, firstName).then().statusCode(SC_CREATED);
     }
 
     @Test
     public void doesCreatingCourierReturnReturnBodyOkTrue() {
-        createCourier(login, password, firstName).then().body("ok", equalTo(true));
+        String login = new LoginGenerate().getRandomLogin();
+        String password = new PasswordGenerate().getRandomPassword();
+        String firstName = new FirstNameGenerate().getRandomFirstName();
+        scooterAPI.createCourier(login, password, firstName).then().body("ok", equalTo(true));
     }
 
     @Test
     public void IsCreatingCourierWithTheSameParametersImpossible() {
-        createCourier(login, password, firstName);
-        createCourier(login, password, firstName).then().statusCode(SC_CONFLICT);
+        String login = new LoginGenerate().getRandomLogin();
+        String password = new PasswordGenerate().getRandomPassword();
+        String firstName = new FirstNameGenerate().getRandomFirstName();
+        scooterAPI.createCourier(login, password, firstName);
+        scooterAPI.createCourier(login, password, firstName).then().statusCode(SC_CONFLICT);
     }
 
     @Test
     public void IsCreatingCourierWithTheSameLoginAndFirstNameButAnotherPasswordImpossible() {
-        createCourier(login, password, firstName);
-        createCourier(login, anotherPassword, firstName).then().statusCode(SC_CONFLICT);
+        String login = new LoginGenerate().getRandomLogin();
+        String password = new PasswordGenerate().getRandomPassword();
+        String firstName = new FirstNameGenerate().getRandomFirstName();
+        String anotherPassword= new PasswordGenerate().getRandomPassword();
+        scooterAPI.createCourier(login, password, firstName);
+        scooterAPI.createCourier(login, anotherPassword, firstName).then().statusCode(SC_CONFLICT);
     }
 
     @Test
     public void IsCreatingCourierWithTheSameLoginAndPasswordButAnotherFirstNameImpossible() {
-        createCourier(login, password, firstName);
-        createCourier(login, password, anotherFirstName).then().statusCode(SC_CONFLICT);
+        String login = new LoginGenerate().getRandomLogin();
+        String password = new PasswordGenerate().getRandomPassword();
+        String firstName = new FirstNameGenerate().getRandomFirstName();
+        String anotherFirstName = new FirstNameGenerate().getRandomFirstName();
+        scooterAPI.createCourier(login, password, firstName);
+        scooterAPI.createCourier(login, password, anotherFirstName).then().statusCode(SC_CONFLICT);
     }
 
     @Test
     public void IsCreatingCourierWithTheSameLoginButAnotherPasswordAndFirstNameImpossible() {
-        createCourier(login, password, firstName);
-        createCourier(login, anotherPassword, anotherFirstName).then().statusCode(SC_CONFLICT);
+        String login = new LoginGenerate().getRandomLogin();
+        String password = new PasswordGenerate().getRandomPassword();
+        String firstName = new FirstNameGenerate().getRandomFirstName();
+        String anotherPassword = new PasswordGenerate().getRandomPassword();
+        String anotherFirstName = new FirstNameGenerate().getRandomFirstName();
+        scooterAPI.createCourier(login, password, firstName);
+        scooterAPI.createCourier(login, anotherPassword, anotherFirstName).then().statusCode(SC_CONFLICT);
     }
 
     @Test
     public void IsCreatingCourierWithoutLoginImpossible() {
-        createCourier(null, password, firstName);
-        loginCourierInSystem(login, password).then().statusCode(SC_NOT_FOUND);
+        String password = new PasswordGenerate().getRandomPassword();
+        String firstName = new FirstNameGenerate().getRandomFirstName();
+        scooterAPI.createCourier(null, password, firstName);
+        scooterAPI.loginCourierInSystem(null, password).then().statusCode(SC_BAD_REQUEST);
     }
 
     @Test
     public void IsCreatingCourierWithoutPasswordImpossible() {
-        createCourier(login, null, firstName);
-        loginCourierInSystem(login, password).then().statusCode(SC_NOT_FOUND);
+        String login = new LoginGenerate().getRandomLogin();
+        String firstName = new FirstNameGenerate().getRandomFirstName();
+        scooterAPI.createCourier(login, null, firstName);
+        scooterAPI.loginCourierInSystem(login, null).then().statusCode(SC_BAD_REQUEST);
     }
 
     @Test
     public void IsCreatingCourierWithoutLoginAndPasswordImpossible() {
-        createCourier(null, null, firstName);
-        loginCourierInSystem(login, password).then().statusCode(SC_NOT_FOUND);
+        String firstName = new FirstNameGenerate().getRandomFirstName();
+        scooterAPI.createCourier(null, null, firstName);
+        scooterAPI.loginCourierInSystem(null, null).then().statusCode(SC_BAD_REQUEST);
     }
 
     @Test
     public void doesCreatingCourierWithoutLoginReturnMistake() {
-        createCourier(null, password, firstName)
+        String password = new PasswordGenerate().getRandomPassword();
+        String firstName = new FirstNameGenerate().getRandomFirstName();
+        scooterAPI.createCourier(null, password, firstName)
                 .then().statusCode(SC_BAD_REQUEST)
                 .and()
                 .body("message", equalTo("Недостаточно данных для создания учетной записи"));
@@ -129,24 +113,23 @@ public class CreateCourierTest {
 
     @Test
     public void doesCreatingCourierWithoutPasswordReturnMistake() {
-        createCourier(login, null, firstName).then().statusCode(SC_BAD_REQUEST)
+        String login = new LoginGenerate().getRandomLogin();
+        String firstName = new FirstNameGenerate().getRandomFirstName();
+        scooterAPI.createCourier(login, null, firstName).then().statusCode(SC_BAD_REQUEST)
                 .and()
                 .body("message", equalTo("Недостаточно данных для создания учетной записи"));
     }
 
     @Test
     public void doesCreatingCourierWithoutLoginAndPasswordReturnMistake() {
-        createCourier(null, null, firstName).then().statusCode(SC_BAD_REQUEST)
+        String firstName = new FirstNameGenerate().getRandomFirstName();
+        scooterAPI.createCourier(null, null, firstName).then().statusCode(SC_BAD_REQUEST)
                 .and()
                 .body("message", equalTo("Недостаточно данных для создания учетной записи"));
     }
 
     @After
     public void cleanUp() {
-        Response response = loginCourierInSystem(login, password);
-        if (response.getStatusCode() == SC_OK) {
-            IDCourier idCourier = response.body().as(IDCourier.class);
-            deleteCourier(idCourier).then().statusCode(SC_OK);
-        }
+        scooterAPI.cleanUp();
     }
 }
