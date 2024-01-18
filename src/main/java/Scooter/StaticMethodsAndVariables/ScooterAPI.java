@@ -3,20 +3,20 @@ package Scooter.StaticMethodsAndVariables;
 import Scooter.DTO.IDCourier;
 import Scooter.DTO.LoginCourier;
 import Scooter.DTO.NewCourier;
+import Scooter.DTO.NewOrder;
 import com.google.gson.Gson;
 import io.restassured.RestAssured;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.response.Response;
-
 import java.util.Stack;
-
 import static io.restassured.RestAssured.given;
 import static org.apache.http.HttpStatus.SC_OK;
 
 public class ScooterAPI {
     private final String handleForCreateCourier = "/api/v1/courier";
     private final String handleForLoginCourier = "/api/v1/courier/login";
+    private final String handleForCreateOrder = "/api/v1/orders";
     private final Stack<LoginCourier> couriersToCleanUp;
 
     public Response createCourier(String givenLogin, String givenPassword, String givenFirstName) {
@@ -49,6 +49,16 @@ public class ScooterAPI {
                 .delete(handleForCreateCourier + "/" + idCourier.getID());
         return response;
     }
+
+    public Response createOrder(NewOrder givenNewOrder){
+        Response response = given()
+                .header("Content-type", "application/json")
+                .body(givenNewOrder)
+                .when()
+                .post(handleForCreateOrder);
+        return response;
+    }
+
 
     public ScooterAPI() {
         RestAssured.baseURI = "http://qa-scooter.praktikum-services.ru";

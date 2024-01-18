@@ -1,6 +1,8 @@
 package Scooter.DTO;
+import Scooter.GenerateData.OrderFactory.OrderGenerate;
+import java.util.List;
 
-public class CreateOrder {
+public class NewOrder {
     private String firstName;
     private String lastName;
     private String address;
@@ -9,9 +11,9 @@ public class CreateOrder {
     private int rentTime;
     private String deliveryDate;
     private String comment;
-    private String[] color;
+    private List<String> color;
 
-    public CreateOrder(String firstName, String lastName, String address, String metroStation, String phone, int rentTime, String deliveryDate, String comment, String[] color) {
+    public NewOrder(String firstName, String lastName, String address, String metroStation, String phone, int rentTime, String deliveryDate, String comment, List<String> color) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.address = address;
@@ -22,8 +24,20 @@ public class CreateOrder {
         this.comment = comment;
         this.color = color;
     }
+    public NewOrder(List<String> color) {
+        OrderGenerate orderGenerate = new OrderGenerate();
+        firstName = orderGenerate.getFirstName();
+        lastName = orderGenerate.getLastName();
+        address = orderGenerate.getAddress();
+        metroStation = orderGenerate.getMetroStation();
+        phone = orderGenerate.getPhone();
+        rentTime = orderGenerate.getRentTime();
+        deliveryDate = orderGenerate.getDeliveryDate();
+        comment = orderGenerate.getComment();
+        this.color = color;
+    }
 
-    public CreateOrder() {
+    public NewOrder() {
     }
 
     public String getFirstName() {
@@ -90,11 +104,11 @@ public class CreateOrder {
         this.comment = comment;
     }
 
-    public String[] getColor() {
+    public List<String> getColor() {
         return color;
     }
 
-    public void setColor(String[] color) {
+    public void setColor(List<String> color) {
         this.color = color;
     }
 }
