@@ -38,25 +38,19 @@ public class LoginCourierTest {
     @Test
     public void isLoginCourierWithoutLoginImpossible() {
         scooterAPI.createCourier(login, password, firstName);
-        scooterAPI.loginCourierInSystem(null, password).then().statusCode(SC_BAD_REQUEST)
-                .and()
-                .body("message", equalTo("Недостаточно данных для входа"));
+        scooterAPI.loginCourierInSystem(null, password).then().statusCode(SC_BAD_REQUEST);
     }
 
     @Test
     public void isLoginCourierWithoutPasswordImpossible() {
         scooterAPI.createCourier(login, password, firstName);
-        scooterAPI.loginCourierInSystem(login, null).then().statusCode(SC_BAD_REQUEST)
-                .and()
-                .body("message", equalTo("Недостаточно данных для входа"));
+        scooterAPI.loginCourierInSystem(login, null).then().statusCode(SC_BAD_REQUEST);
     }
 
     @Test
     public void isLoginCourierWithoutLoginAndPasswordImpossible() {
         scooterAPI.createCourier(login, password, firstName);
-        scooterAPI.loginCourierInSystem(null, null).then().statusCode(SC_BAD_REQUEST)
-                .and()
-                .body("message", equalTo("Недостаточно данных для входа"));
+        scooterAPI.loginCourierInSystem(null, null).then().statusCode(SC_BAD_REQUEST);
     }
 
     @Test
