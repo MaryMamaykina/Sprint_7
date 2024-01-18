@@ -6,12 +6,15 @@ import Scooter.DTO.NewCourier;
 import Scooter.DTO.NewOrder;
 import com.google.gson.Gson;
 import io.qameta.allure.Description;
+import io.qameta.allure.Step;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.RestAssured;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.response.Response;
+
 import java.util.Stack;
+
 import static io.restassured.RestAssured.given;
 import static org.apache.http.HttpStatus.SC_OK;
 
@@ -29,8 +32,7 @@ public class ScooterAPI {
 
     }
 
-    @DisplayName("Create Courier")
-    @Description("This method accepts required data for create request body for create courier, sent post request with this data (in json)," +
+    @Step("This method accepts required data for create request body for create courier, sent post request with this data (in json)," +
             "push this courier's login and password (as an object of the LoginCourier class) in stack (for deleting after). The method returns response for further verification.")
     public Response createCourier(String givenLogin, String givenPassword, String givenFirstName) {
         NewCourier newCourier = new NewCourier(givenLogin, givenPassword, givenFirstName);
@@ -44,8 +46,7 @@ public class ScooterAPI {
         return response;
     }
 
-    @DisplayName("Login Courier in System")
-    @Description("This method accepts required data for create request body for login courier, sent post request with this data (in json)." +
+    @Step("This method accepts required data for create request body for login courier, sent post request with this data (in json)." +
             " The method returns response for further verification.")
     public Response loginCourierInSystem(String givenLogin, String givenPassword) {
         LoginCourier loginCourier = new LoginCourier(givenLogin, givenPassword);
@@ -56,8 +57,7 @@ public class ScooterAPI {
                 .post(handleForLoginCourier);
     }
 
-    @DisplayName("Delete Courier from System")
-    @Description("This method accepts required data for create request body for delete courier, sent delete request with this data (in json)." +
+    @Step("This method accepts required data for create request body for delete courier, sent delete request with this data (in json)." +
             " The method returns response for further verification.")
     public Response deleteCourier(IDCourier idCourier) {
         return given()
@@ -67,8 +67,7 @@ public class ScooterAPI {
                 .delete(handleForCreateCourier + "/" + idCourier.getID());
     }
 
-    @DisplayName("Create Order")
-    @Description("This method accepts required data for create request body for create order, sent post request with this data (in json)." +
+    @Step("This method accepts required data for create request body for create order, sent post request with this data (in json)." +
             " The method returns response for further verification.")
     public Response createOrder(NewOrder givenNewOrder) {
         return given()
@@ -78,16 +77,14 @@ public class ScooterAPI {
                 .post(handleForCreateOrder);
     }
 
-    @DisplayName("Get List of orders")
-    @Description("This method sent get request. The method returns response for further verification.")
+    @Step("This method sent get request. The method returns response for further verification.")
     public Response getListOfOrders() {
         return given()
                 .when()
                 .get(handleForGetListOfOrder);
     }
 
-    @DisplayName("Clean up")
-    @Description("The method is used to delete all couriers created during the testing process, all stack data is searched." +
+    @Step("The method is used to delete all couriers created during the testing process, all stack data is searched." +
             " If the courier can be logged in using the specified data, it is deleted.")
     public void cleanUp() {
         while (!couriersToCleanUp.isEmpty()) {
