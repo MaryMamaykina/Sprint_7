@@ -17,6 +17,7 @@ public class ScooterAPI {
     private final String handleForCreateCourier = "/api/v1/courier";
     private final String handleForLoginCourier = "/api/v1/courier/login";
     private final String handleForCreateOrder = "/api/v1/orders";
+    private final String handleForGetListOfOrder = "/api/v1/orders";
     private final Stack<LoginCourier> couriersToCleanUp;
 
     public Response createCourier(String givenLogin, String givenPassword, String givenFirstName) {
@@ -56,6 +57,13 @@ public class ScooterAPI {
                 .body(givenNewOrder)
                 .when()
                 .post(handleForCreateOrder);
+        return response;
+    }
+
+    public Response getListOfOrders(){
+        Response response = given()
+                .when()
+                .get(handleForGetListOfOrder);
         return response;
     }
 
