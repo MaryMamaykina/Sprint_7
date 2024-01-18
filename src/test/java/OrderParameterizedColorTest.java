@@ -1,4 +1,5 @@
 import Scooter.DTO.NewOrder;
+import Scooter.GenerateData.OrderFactory.OrderFactory;
 import Scooter.StaticMethodsAndVariables.ScooterAPI;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,17 +30,11 @@ public class OrderParameterizedColorTest {
 
     @Test
     public void parameterizedTestDoesCreateOrderWithDifferentColorReturnStatusCode201() {
-
-        NewOrder order = new NewOrder(color);
-        order.setColor(color);
-        scooterAPI.createOrder(order).then().statusCode(SC_CREATED);
+        scooterAPI.createOrder(OrderFactory.getByColors(color)).then().statusCode(SC_CREATED);
     }
 
     @Test
     public void parameterizedTestDoesCreateOrderWithDifferentColorReturnTrack() {
-
-        NewOrder order = new NewOrder(color);
-        order.setColor(color);
-        scooterAPI.createOrder(order).then().body("track", notNullValue());
+        scooterAPI.createOrder(OrderFactory.getByColors(color)).then().body("track", notNullValue());
     }
 }

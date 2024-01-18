@@ -1,6 +1,6 @@
-import Scooter.GenerateData.CourierFactory.FirstNameGenerate;
-import Scooter.GenerateData.CourierFactory.LoginGenerate;
-import Scooter.GenerateData.CourierFactory.PasswordGenerate;
+import Scooter.GenerateData.CourierFactory.FirstNameFactory;
+import Scooter.GenerateData.CourierFactory.LoginFactory;
+import Scooter.GenerateData.CourierFactory.PasswordFactory;
 import Scooter.StaticMethodsAndVariables.ScooterAPI;
 import org.junit.After;
 import org.junit.Test;
@@ -12,9 +12,9 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 public class LoginCourierTest {
 
     ScooterAPI scooterAPI = new ScooterAPI();
-    String login = new LoginGenerate().getRandomLogin();
-    String password = new PasswordGenerate().getRandomPassword();
-    String firstName = new FirstNameGenerate().getRandomFirstName();
+    String login = new LoginFactory().getRandomLogin();
+    String password = new PasswordFactory().getRandomPassword();
+    String firstName = new FirstNameFactory().getRandomFirstName();
 
     @Test
     public void doesLoginCourierWork() {
@@ -77,7 +77,7 @@ public class LoginCourierTest {
     @Test
     public void doesLoginCourierWithWrongLoginReturnAccountWasNotFound() {
         scooterAPI.createCourier(login, password, firstName);
-        String wronglogin = new LoginGenerate().getRandomLogin();
+        String wronglogin = new LoginFactory().getRandomLogin();
         scooterAPI.loginCourierInSystem(wronglogin, password).then().statusCode(SC_NOT_FOUND)
                 .and()
                 .body("message", equalTo("Учетная запись не найдена"));
@@ -86,7 +86,7 @@ public class LoginCourierTest {
     @Test
     public void doesLoginCourierWithWrongPasswordReturnAccountWasNotFound() {
         scooterAPI.createCourier(login, password, firstName);
-        String wrongpassword = new PasswordGenerate().getRandomPassword();
+        String wrongpassword = new PasswordFactory().getRandomPassword();
         scooterAPI.loginCourierInSystem(login, wrongpassword).then().statusCode(SC_NOT_FOUND)
                 .and()
                 .body("message", equalTo("Учетная запись не найдена"));

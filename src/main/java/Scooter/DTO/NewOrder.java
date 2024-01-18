@@ -1,5 +1,4 @@
 package Scooter.DTO;
-import Scooter.GenerateData.OrderFactory.OrderGenerate;
 import java.util.List;
 
 public class NewOrder {
@@ -24,18 +23,7 @@ public class NewOrder {
         this.comment = comment;
         this.color = color;
     }
-    public NewOrder(List<String> color) {
-        OrderGenerate orderGenerate = new OrderGenerate();
-        firstName = orderGenerate.getFirstName();
-        lastName = orderGenerate.getLastName();
-        address = orderGenerate.getAddress();
-        metroStation = orderGenerate.getMetroStation();
-        phone = orderGenerate.getPhone();
-        rentTime = orderGenerate.getRentTime();
-        deliveryDate = orderGenerate.getDeliveryDate();
-        comment = orderGenerate.getComment();
-        this.color = color;
-    }
+
 
     public NewOrder() {
     }
