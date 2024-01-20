@@ -1,5 +1,5 @@
 import scooter.generatedata.orderfactory.OrderFactory;
-import scooter.staticmethodsandvariables.ScooterAPI;
+import scooter.staticmethodsandvariables.OrderAPI;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -15,7 +15,7 @@ public class OrderParameterizedColorTest {
         this.color = color;
     }
 
-    ScooterAPI scooterAPI = new ScooterAPI();
+    OrderAPI orderAPI = new OrderAPI();
 
     @Parameterized.Parameters(name = "color: {0}")
     public static Object[] getColor() {
@@ -29,7 +29,7 @@ public class OrderParameterizedColorTest {
 
     @Test
     public void parameterizedTestDoesCreateOrderWithDifferentColorReturnStatusCode201() {
-        scooterAPI.createOrder(OrderFactory.getByColors(color)).then().statusCode(SC_CREATED)
+        orderAPI.createOrder(OrderFactory.getByColors(color)).then().statusCode(SC_CREATED)
                 .and()
                 .body("track", notNullValue());
     }
