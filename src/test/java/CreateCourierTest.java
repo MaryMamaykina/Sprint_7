@@ -1,7 +1,7 @@
-import Scooter.GenerateData.CourierFactory.FirstNameFactory;
-import Scooter.GenerateData.CourierFactory.LoginFactory;
-import Scooter.GenerateData.CourierFactory.PasswordFactory;
-import Scooter.StaticMethodsAndVariables.ScooterAPI;
+import scooter.generatedata.courierfactory.FirstNameFactory;
+import scooter.generatedata.courierfactory.LoginFactory;
+import scooter.generatedata.courierfactory.PasswordFactory;
+import scooter.staticmethodsandvariables.ScooterAPI;
 import org.junit.After;
 import org.junit.Test;
 import static org.apache.http.HttpStatus.*;

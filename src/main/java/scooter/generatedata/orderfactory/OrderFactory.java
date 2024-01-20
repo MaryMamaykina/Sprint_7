@@ -1,5 +1,5 @@
-package Scooter.GenerateData.OrderFactory;
-import Scooter.DTO.NewOrder;
+package scooter.generatedata.orderfactory;
+import scooter.dto.NewOrder;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;

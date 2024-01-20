@@ -1,13 +1,10 @@
-package Scooter.StaticMethodsAndVariables;
+package scooter.staticmethodsandvariables;
 
-import Scooter.DTO.IDCourier;
-import Scooter.DTO.LoginCourier;
-import Scooter.DTO.NewCourier;
-import Scooter.DTO.NewOrder;
-import com.google.gson.Gson;
-import io.qameta.allure.Description;
+import scooter.dto.IDCourier;
+import scooter.dto.LoginCourier;
+import scooter.dto.NewCourier;
+import scooter.dto.NewOrder;
 import io.qameta.allure.Step;
-import io.qameta.allure.junit4.DisplayName;
 import io.restassured.RestAssured;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
@@ -39,7 +36,7 @@ public class ScooterAPI {
         Response response = given()
                 .header("Content-type", "application/json")
                 .and()
-                .body(new Gson().toJson(newCourier))
+                .body(newCourier)
                 .when()
                 .post(handleForCreateCourier);
         couriersToCleanUp.push(new LoginCourier(givenLogin, givenPassword));
@@ -52,7 +49,7 @@ public class ScooterAPI {
         LoginCourier loginCourier = new LoginCourier(givenLogin, givenPassword);
         return given()
                 .header("Content-type", "application/json")
-                .body(new Gson().toJson(loginCourier))
+                .body(loginCourier)
                 .when()
                 .post(handleForLoginCourier);
     }
